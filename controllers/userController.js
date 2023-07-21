@@ -95,10 +95,10 @@ module.exports = {
             );
 
             if(!user){
-                res.status(404).json({ message: 'No user found at this id!'});
+                return res.status(404).json({ message: 'No user found at this id!'});
             }
 
-            res.json(user);
+            return res.json(user);
         }catch(err){
             console.log(err);
             return res.status(500).json(err);
