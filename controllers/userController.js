@@ -1,6 +1,5 @@
 const { ObjectID } = require('mongoose').Types;
 const { Thought, User } = require('../models');
-const user = require('../models/User');
 
 const totalUsers = async () => {
     const userNum = await User.aggregate()
@@ -59,7 +58,6 @@ module.exports = {
 
             res.json({
                 user,
-                thought: ,
             })
         }catch(err){
             console.log(err);
@@ -69,8 +67,9 @@ module.exports = {
 
     //POST create a new user
     async createUser(req, res) {
+        console.log(req.body);
         try{
-            const user = await user.create(req.body);
+            const user = await User.create(req.body);
             res.json(user);
         }catch(err){
             res.status(500).json(err);
@@ -80,9 +79,69 @@ module.exports = {
     //DELETE a given user
     async deleteUser(req, res) {
         try{
-            const user = await user.delete(req.body);
+            const user = await User.delete(req.body);
         }catch(err){
             res.status(500).json(err);
         }
-    }
+    },
+
+    //PUT a given user
+    async updateUser(req, res){
+        try{
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $set: req.body },
+                { runValidators: true, new: true }
+            );
+
+            if(!user){
+                res.status(404).json({ message: 'No user found at this id!'});
+            }
+
+            res.json(user);
+        }catch(err){
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    },
+
+    //POST a friend to a given user
+    async createFriend(req, res){
+        try{
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $push: { friends: req.params.friendId } },
+                { runValidators: true, new: true }
+            );
+
+            if(!user){
+                res.status(404).json({ message: 'No user found at this id!' });
+            }
+
+            res.json(user);
+        }catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    },
+
+    //DELETE a friend from a given user's list
+    async deleteFriend(req, res){
+        try{
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $pull: req.params.friendId },
+                { runValidators: true, new: true }
+            )
+
+            if(!user){
+                res.status(404).json({ message: 'No user found at this id!' });
+            }
+
+            res.json(user);
+        }catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    },
 };

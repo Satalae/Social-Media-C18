@@ -18,7 +18,7 @@ const userSchema = new Schema(
         thoughts: [thoughtSchema],
         friends: [
             {
-                type: Schema.type.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: 'user',
             },
         ],
@@ -38,6 +38,6 @@ userSchema
         return this.friends.length;
     });
 
-const user = model('user', userSchema);
+const User = model('user', userSchema);
 
-module.exports = user;
+module.exports = User;
